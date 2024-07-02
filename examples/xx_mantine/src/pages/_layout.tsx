@@ -2,10 +2,10 @@
 import '@mantine/core/styles.css';
 
 import type { ReactNode } from 'react';
-import { MantineProvider } from '@mantine/core';
+import { Autocomplete, MantineProvider } from '@mantine/core';
 import {theme} from '../theme';
 import { Button } from '@mantine/core';
-import ComboBox from '../components/MuiAutocomplete';
+import ComboBox from '../components/Combox';
 
 type RootLayoutProps = { children: ReactNode };
 
@@ -14,12 +14,18 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
   return (
     <MantineProvider  theme={theme}>
-    <Button
+    {/* <Button
         variant='contained'
       >
         DEMO
       </Button>
-      <ComboBox />
+      <ComboBox /> */}
+      {/* <Autocomplete
+      label="Your favorite library"
+      placeholder="Pick value or enter anything"
+      data={['React', 'Angular', 'Vue', 'Svelte']}
+    /> */}
+    {children}
     </MantineProvider>
     
   );

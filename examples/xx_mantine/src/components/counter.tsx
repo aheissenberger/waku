@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, MantineProvider } from '@mantine/core';
-import {theme} from '../theme';
+import { Button } from '@mantine/core';
 
 export const Counter = () => {
   const [count, setCount] = useState(0);
@@ -11,7 +10,7 @@ export const Counter = () => {
 
   return (
     <>
-    <MantineProvider  theme={theme}>{/* placing the MantineProvider here will cause the Conuter to not throw "MantineProvider not found" */}
+    {/* <MantineProvider  theme={theme}>*/}{/* placing the MantineProvider here will cause the Conuter to not throw "MantineProvider not found" */}
     <section className="border-blue-400 -mx-4 mt-4 rounded border border-dashed p-4">
       <div>Count: {count}</div>
       <Button
@@ -20,7 +19,7 @@ export const Counter = () => {
         Increment
       </Button>
     </section>
-    </MantineProvider>
+    {/* </MantineProvider> */}
     </>
   );
 };

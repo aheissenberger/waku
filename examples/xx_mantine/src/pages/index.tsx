@@ -1,9 +1,9 @@
 import { Link } from 'waku';
 
 import { Counter } from '../components/counter';
-import { Button } from '@mantine/core';
+import { Button,Autocomplete} from '@mantine/core';
 import ComboBox from '../components/Combox';
-import { Autocomplete } from '@mantine/core';
+//import MyDate from '../components/MyDate';
 export default async function HomePage() {
   const data = await getData();
 
@@ -21,12 +21,13 @@ export default async function HomePage() {
       >
         DEMO BUTTTON 2
       </Button>
-      <ComboBox />
-      <Autocomplete
+       <ComboBox />
+     <Autocomplete
       label="Your favorite library"
       placeholder="Pick value or enter anything"
       data={['React', 'Angular', 'Vue', 'Svelte']}
-    />
+    /> 
+    {/* <MyDate /> */}
     </div>
   );
 }

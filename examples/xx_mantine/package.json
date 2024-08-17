@@ -16,10 +16,10 @@
     "@mantine/dates": "^7.12.1",
     "@mantine/hooks": "^7.12.1",
     "dayjs": "^1.11.12",
-    "react": "19.0.0-rc.0",
-    "react-dom": "19.0.0-rc.0",
-    "react-server-dom-webpack": "19.0.0-rc.0",
-    "waku": "0.21.0-beta.0"
+    "react": "19.0.0-rc-68dbd84b-20240812",
+    "react-dom": "19.0.0-rc-68dbd84b-20240812",
+    "react-server-dom-webpack": "19.0.0-rc-68dbd84b-20240812",
+    "waku": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "18.3.3",
@@ -32,6 +32,6 @@
     "serverless-cloudfront-invalidate": "^1.12.2",
     "serverless-s3-sync": "^3.3.0",
     "serverless-scriptable-plugin": "^1.3.1",
-    "typescript": "5.4.5"
+    "typescript": "5.5.4"
   }
 }

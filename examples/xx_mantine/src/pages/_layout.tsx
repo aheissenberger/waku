@@ -3,7 +3,7 @@ import '@mantine/core/styles.css';
 
 import type { ReactNode } from 'react';
 import { MantineProvider } from '@mantine/core';
-import {theme} from '../theme';
+import { theme } from '../theme';
 
 type RootLayoutProps = { children: ReactNode };
 
@@ -11,10 +11,14 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const data = await getData();
 
   return (
-    <MantineProvider  theme={theme} withNormalizeCSS>
-    {children}
-    </MantineProvider>
-    
+    <html>
+      <head></head>
+      <body>
+        <MantineProvider theme={theme} withNormalizeCSS>
+          {children}
+        </MantineProvider>
+      </body>
+    </html>
   );
 }
 

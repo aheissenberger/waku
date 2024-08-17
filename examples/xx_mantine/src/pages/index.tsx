@@ -1,10 +1,10 @@
 import { Link } from 'waku';
 
 import { Counter } from '../components/counter';
-import { Button,Autocomplete} from '@mantine/core';
+import { Button, Autocomplete } from '@mantine/core';
 import ComboBox from '../components/Combox';
 import MyDate from '../components/MyDate';
-import MyAreaChart from '../components/charts/AreaChart/MyAreaChart';
+
 export default async function HomePage() {
   const data = await getData();
 
@@ -13,6 +13,7 @@ export default async function HomePage() {
       <title>{data.title}</title>
       <h1 className="text-4xl font-bold tracking-tight">{data.headline}</h1>
       <p>{data.body}</p>
+      <div><Link to="/forms">Forms</Link> | <Link to="/charts">Charts</Link> | <Link to="/code">Code Highlights</Link> | <Link to="/notifications">Notifications</Link> | <Link to="/spotlights">Spotlights</Link> | <Link to="/carousels">Charousels</Link> | <Link to="/dropzones">Dropzones</Link> | <Link to="/navigationprogresses">Navigation Progresses</Link> | <Link to="/modalsmanager">Modals Manager</Link> | <Link to="/rte">Rich Text Editor</Link></div>
       <Counter />
       <Link to="/about" className="mt-4 inline-block underline">
         About page
@@ -22,14 +23,13 @@ export default async function HomePage() {
       >
         DEMO BUTTTON 2
       </Button>
-       <ComboBox />
-     <Autocomplete
-      label="Your favorite library"
-      placeholder="Pick value or enter anything"
-      data={['LOCAL','React', 'Angular', 'Vue', 'Svelte']}
-    /> 
-    <MyDate /> 
-    {/* <MyAreaChart /> */}
+      <ComboBox />
+      <Autocomplete
+        label="Your favorite library"
+        placeholder="Pick value or enter anything"
+        data={['LOCAL', 'React', 'Angular', 'Vue', 'Svelte']}
+      />
+      <MyDate />
     </div>
   );
 }

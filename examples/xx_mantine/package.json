@@ -7,8 +7,9 @@
     "dev": "waku dev",
     "build": "waku build",
     "start": "waku start",
-    "build:aws": "waku build --with-aws-lambda",
-    "deploy:aws": "sls deploy"
+    "aws:build": "waku build --with-aws-lambda",
+    "aws:deploy": "sls deploy",
+    "aws:cloudfronturl": "aws --region eu-central-1 cloudformation describe-stacks --stack-name waku-mt001-dev-demo-dev --region eu-central-1 --query \"Stacks[0].Outputs[?OutputKey=='FrontendCloudFrontDistributionUrl'].OutputValue\" --output text"
   },
   "dependencies": {
     "@fontsource/roboto": "^5.0.14",
@@ -41,7 +42,7 @@
     "react-client-only": "^1.0.2",
     "react-dom": "19.0.0-rc-68dbd84b-20240812",
     "react-server-dom-webpack": "19.0.0-rc-68dbd84b-20240812",
-    "recharts": "2",
+    "recharts": "^2.12.7",
     "waku": "workspace:*"
   },
   "devDependencies": {

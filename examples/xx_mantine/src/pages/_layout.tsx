@@ -13,7 +13,6 @@ import { ColorSchemeScript } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
 import { theme } from '../theme';
-import MantineColorSchemeScript from '../components/MantineColorSchemeScript';
 
 type RootLayoutProps = { children: ReactNode };
 
@@ -22,7 +21,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
   return (
     <html>
-      <head><ColorSchemeScript /></head>
+      <head>{/*<ColorSchemeScript />*/}</head>
       <body>
         <MantineProvider theme={theme} withNormalizeCSS>
           <Notifications />

@@ -216,20 +216,6 @@ npm install @mantine/carousel
 
 ### Dropzone
 
-```
-client.js:93
-
-
-       GET http://localhost:3000/RSC/dropzone.txt 404 (Not Found)
-
-
-The above error occurred in the <OuterSlot> component.
-
-React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
-```
-
-- build / start: OK
-
 1. modify `vite.config.ts`:
 
    1. add `,"@mantine/dropzone"` to `optimizeDeps.excludes` array

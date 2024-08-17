@@ -4,6 +4,7 @@ import { Counter } from '../components/counter';
 import { Button,Autocomplete} from '@mantine/core';
 import ComboBox from '../components/Combox';
 import MyDate from '../components/MyDate';
+import MyAreaChart from '../components/charts/AreaChart/MyAreaChart';
 export default async function HomePage() {
   const data = await getData();
 
@@ -28,6 +29,7 @@ export default async function HomePage() {
       data={['LOCAL','React', 'Angular', 'Vue', 'Svelte']}
     /> 
     <MyDate /> 
+    {/* <MyAreaChart /> */}
     </div>
   );
 }

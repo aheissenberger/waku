@@ -216,10 +216,6 @@ npm install @mantine/carousel
 
 ### Dropzone
 
-**not working:**
-
-- DEV:
-
 ```
 client.js:93
 
@@ -274,6 +270,7 @@ npm install @mantine/nprogress
 ```sh
 npm install @mantine/modals
 ```
+
 4. add `import { ModalsProvider } from '@mantine/modals';` to `src/pages/_layout.tsx`
 5. wrap inner content of `<MantineProvider>` with `<ModalsProvider > </ModalsProvider >` in `src/pages/_layout.tsx`
 

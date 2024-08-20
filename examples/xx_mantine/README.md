@@ -9,9 +9,6 @@ export default {
   optimizeDeps: {
       exclude: ["@mantine/core", "@mantine/hooks","@mantine/dates","@mantine/charts","recharts"],
       include: ["dayjs", "dayjs/plugin/*"]
-  },
-  ssr: {
-      noExternal: ["@mantine/core", "@mantine/hooks","@mantine/dates","@mantine/charts","recharts"],
   }
 };
 ```
@@ -113,7 +110,6 @@ npm install @mantine/form
 
    1. add `,"@mantine/dates"` to `optimizeDeps.excludes` array
    2. add `include: ["dayjs", "dayjs/plugin/*"]` to `optimizeDeps` as new property
-   3. add `,"@mantine/dates"` to `ssr.noExternal` array
 
 2. install dependencies
 
@@ -133,7 +129,6 @@ npm install @mantine/dates dayjs
 1. modify `vite.config.ts`:
 
    1. add `,"@mantine/charts"` to `optimizeDeps.excludes` array
-   2. add `,"@mantine/charts"` to `ssr.noExternal` array
 
 2. install dependencies
 
@@ -151,7 +146,6 @@ npm install @mantine/charts recharts@2
 
    1. add `,"@mantine/code-highlight"` to `optimizeDeps.excludes` array
    2. add `'@mantine/code-highlight > highlight.js'` to `optimizeDeps.include` array
-   3. add `,"@mantine/code-highlight"` to `ssr.noExternal` array
 
 2. install dependencies
 
@@ -167,7 +161,6 @@ npm install @mantine/code-highlight
 
    1. add `,"@mantine/notifications"` to `optimizeDeps.excludes` array
    2. add `'@mantine/notifications > prop-types'` to `optimizeDeps.include` array
-   3. add `,"@mantine/notifications"` to `ssr.noExternal` array
 
 2. install dependencies
 
@@ -184,7 +177,6 @@ npm install @mantine/notifications
 1. modify `vite.config.ts`:
 
    1. add `,"@mantine/spotlight"` to `optimizeDeps.excludes` array
-   2. add `,"@mantine/spotlight"` to `ssr.noExternal` array
 
 2. install dependencies
 
@@ -204,7 +196,6 @@ npm install @mantine/spotlight
 1. modify `vite.config.ts`:
 
    1. add `,"@mantine/carousel"` to `optimizeDeps.excludes` array
-   2. add `,"@mantine/carousel"` to `ssr.noExternal` array
 
 2. install dependencies
 
@@ -219,7 +210,6 @@ npm install @mantine/carousel
 1. modify `vite.config.ts`:
 
    1. add `,"@mantine/dropzone"` to `optimizeDeps.excludes` array
-   2. add `,"@mantine/dropzone"` to `ssr.noExternal` array
 
 2. install dependencies
 
@@ -234,7 +224,6 @@ npm install @mantine/dropzone
 1. modify `vite.config.ts`:
 
    1. add `,"@mantine/nprogress"` to `optimizeDeps.excludes` array
-   2. add `,"@mantine/nprogress"` to `ssr.noExternal` array
 
 2. install dependencies
 
@@ -249,7 +238,6 @@ npm install @mantine/nprogress
 1. modify `vite.config.ts`:
 
    1. add `,"@mantine/modals"` to `optimizeDeps.excludes` array
-   2. add `,"@mantine/modals"` to `ssr.noExternal` array
 
 2. install dependencies
 
@@ -265,7 +253,6 @@ npm install @mantine/modals
 1. modify `vite.config.ts`:
 
    1. add `,"@mantine/dropzone"` to `optimizeDeps.excludes` array
-   2. add `,"@mantine/dropzone"` to `ssr.noExternal` array
 
 2. install dependencies
 

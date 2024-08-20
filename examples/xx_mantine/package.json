@@ -8,8 +8,8 @@
     "build": "waku build",
     "start": "waku start",
     "aws:build": "waku build --with-aws-lambda",
-    "aws:deploy": "sls deploy",
-    "aws:cloudfronturl": "aws --region eu-central-1 cloudformation describe-stacks --stack-name waku-mt001-dev-demo-dev --region eu-central-1 --query \"Stacks[0].Outputs[?OutputKey=='FrontendCloudFrontDistributionUrl'].OutputValue\" --output text"
+    "aws:deploy": "sls deploy && pnpm aws:cloudfronturl",
+    "aws:cloudfronturl": "sls info --verbose | grep FrontendCloudFrontDistributionUrl"
   },
   "dependencies": {
     "@fontsource/roboto": "^5.0.14",

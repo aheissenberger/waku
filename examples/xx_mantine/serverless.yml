@@ -255,4 +255,4 @@ resources:
         Ref: Distribution
     FrontendCloudFrontDistributionUrl:
       Description: "CloudFront distribution URL"
-      Value: { "Fn::GetAtt": ["Distribution", "DomainName"] }
+      Value: !Join ['', ['https://', !GetAtt Distribution.DomainName]]

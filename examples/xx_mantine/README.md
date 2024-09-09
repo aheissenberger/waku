@@ -9,7 +9,19 @@ export default {
   optimizeDeps: {
       exclude: ["@mantine/core", "@mantine/hooks","@mantine/dates","@mantine/charts","recharts"],
       include: ["dayjs", "dayjs/plugin/*"]
-  }
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) { // this will keep the core in one bundle
+          if (id.includes("@mantine/core")) {
+            return "@mantine/core";
+          }
+        },
+      },
+    },
+  },
 };
 ```
 

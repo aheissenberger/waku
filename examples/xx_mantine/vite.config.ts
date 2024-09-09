@@ -25,4 +25,16 @@ export default {
   //     "@mantine/carousel",
   //     "@mantine/dropzone", "@mantine/nprogress", "@mantine/modals", "@mantine/tiptap"],
   // }
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("@mantine/core")) {
+            return "@mantine/core";
+          }
+        },
+      },
+    },
+  },
 };

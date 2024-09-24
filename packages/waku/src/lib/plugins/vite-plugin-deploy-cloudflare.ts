@@ -1,5 +1,6 @@
 import path from 'node:path';
 import {
+  appendFileSync,
   existsSync,
   mkdirSync,
   readdirSync,
@@ -7,51 +8,77 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs';
-import { normalizePath } from 'vite';
 import type { Plugin } from 'vite';
 
-// HACK: Depending on a different plugin isn't ideal.
-// Maybe we could put in vite config object?
-import { SRC_ENTRIES } from './vite-plugin-rsc-managed.js';
-
 import { unstable_getPlatformObject } from '../../server.js';
-import { EXTENSIONS } from '../config.js';
-import {
-  decodeFilePathFromAbsolute,
-  extname,
-  fileURLToFilePath,
-  joinPath,
-} from '../utils/path.js';
-import { DIST_SERVE_JS, DIST_PUBLIC } from '../builder/constants.js';
+import { SRC_ENTRIES } from '../constants.js';
+import { DIST_ENTRIES_JS, DIST_PUBLIC } from '../builder/constants.js';
 
-const resolveFileName = (fname: string) => {
-  for (const ext of EXTENSIONS) {
-    const resolvedName = fname.slice(0, -extname(fname).length) + ext;
-    if (existsSync(resolvedName)) {
-      return resolvedName;
+const SERVE_JS = 'serve-cloudflare.js';
+
+const getServeJsContent = (srcEntriesFile: string) => `
+import { runner, importHono, importHonoContextStorage } from 'waku/unstable_hono';
+
+const { Hono } = await importHono();
+const { contextStorage } = await importHonoContextStorage();
+
+const loadEntries = () => import('${srcEntriesFile}');
+let serveWaku;
+
+const app = new Hono();
+app.use(contextStorage());
+app.use('*', (c, next) => serveWaku(c, next));
+app.notFound(async (c) => {
+  const assetsFetcher = c.env.ASSETS;
+  const url = new URL(c.req.raw.url);
+  const errorHtmlUrl = url.origin + '/404.html';
+  const notFoundStaticAssetResponse = await assetsFetcher.fetch(
+    new URL(errorHtmlUrl),
+  );
+  if (notFoundStaticAssetResponse && notFoundStaticAssetResponse.status < 400) {
+    return c.body(notFoundStaticAssetResponse.body, 404);
+  }
+  return c.text('404 Not Found', 404);
+});
+
+export default {
+  async fetch(request, env, ctx) {
+    if (!serveWaku) {
+      serveWaku = runner({ cmd: 'start', loadEntries, env });
+    }
+    return app.fetch(request, env, ctx);
+  },
+};
+`;
+
+const getFiles = (dir: string, files: string[] = []): string[] => {
+  const entries = readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      getFiles(fullPath, files);
+    } else {
+      files.push(fullPath);
     }
   }
-  return fname; // returning the default one
+  return files;
 };
-
-const srcServeFile = decodeFilePathFromAbsolute(
-  joinPath(
-    fileURLToFilePath(import.meta.url),
-    '../../builder/serve-cloudflare.js',
-  ),
-);
 
 const WORKER_JS_NAME = '_worker.js';
 const ROUTES_JSON_NAME = '_routes.json';
+const HEADERS_NAME = '_headers';
 
 type StaticRoutes = { version: number; include: string[]; exclude: string[] };
 
 export function deployCloudflarePlugin(opts: {
   srcDir: string;
   distDir: string;
+  rscPath: string;
+  privateDir: string;
 }): Plugin {
   const platformObject = unstable_getPlatformObject();
   let rootDir: string;
+  let entriesFile: string;
   return {
     name: 'deploy-cloudflare-plugin',
     config(viteConfig) {
@@ -59,28 +86,38 @@ export function deployCloudflarePlugin(opts: {
       if (unstable_phase !== 'buildServerBundle' || deploy !== 'cloudflare') {
         return;
       }
-
-      // FIXME This seems too hacky (The use of viteConfig.root, '.', path.resolve and resolveFileName)
-      const entriesFile = normalizePath(
-        resolveFileName(
-          path.resolve(
-            viteConfig.root || '.',
-            opts.srcDir,
-            SRC_ENTRIES + '.jsx',
-          ),
-        ),
-      );
       const { input } = viteConfig.build?.rollupOptions ?? {};
       if (input && !(typeof input === 'string') && !(input instanceof Array)) {
-        input[DIST_SERVE_JS.replace(/\.js$/, '')] = srcServeFile;
+        input[SERVE_JS.replace(/\.js$/, '')] = `${opts.srcDir}/${SERVE_JS}`;
       }
-      viteConfig.define = {
-        ...viteConfig.define,
-        'import.meta.env.WAKU_ENTRIES_FILE': JSON.stringify(entriesFile),
-      };
     },
     configResolved(config) {
       rootDir = config.root;
+      entriesFile = `${rootDir}/${opts.srcDir}/${SRC_ENTRIES}`;
+      const { deploy, unstable_phase } = platformObject.buildOptions || {};
+      if (
+        (unstable_phase !== 'buildServerBundle' &&
+          unstable_phase !== 'buildSsrBundle') ||
+        deploy !== 'cloudflare'
+      ) {
+        return;
+      }
+      config.ssr.target = 'webworker';
+      config.ssr.resolve ||= {};
+      config.ssr.resolve.conditions ||= [];
+      config.ssr.resolve.conditions.push('worker');
+      config.ssr.resolve.externalConditions ||= [];
+      config.ssr.resolve.externalConditions.push('worker');
+    },
+    resolveId(source) {
+      if (source === `${opts.srcDir}/${SERVE_JS}`) {
+        return source;
+      }
+    },
+    load(id) {
+      if (id === `${opts.srcDir}/${SERVE_JS}`) {
+        return getServeJsContent(entriesFile);
+      }
     },
     closeBundle() {
       const { deploy, unstable_phase } = platformObject.buildOptions || {};
@@ -106,7 +143,7 @@ export function deployCloudflarePlugin(opts: {
         writeFileSync(
           workerEntrypoint,
           `
-import server from './${DIST_SERVE_JS}'
+import server from './${SERVE_JS}'
 
 export default {
   ...server
@@ -120,22 +157,36 @@ export default {
       const routesFile = path.join(outDir, ROUTES_JSON_NAME);
       const publicDir = path.join(outDir, WORKER_JS_NAME, DIST_PUBLIC);
       if (!existsSync(path.join(publicDir, ROUTES_JSON_NAME))) {
-        const staticPaths: string[] = [];
-        const paths = readdirSync(publicDir, {
-          withFileTypes: true,
-        });
+        // exclude strategy
+        const staticPaths: string[] = ['/assets/*'];
+        const paths = getFiles(publicDir);
         for (const p of paths) {
-          if (p.isDirectory()) {
-            const entry = `/${p.name}/*`;
-            if (!staticPaths.includes(entry)) {
-              staticPaths.push(entry);
-            }
-          } else {
-            if (p.name === WORKER_JS_NAME) {
-              return;
-            }
-            staticPaths.push(`/${p.name}`);
+          const basePath = path.dirname(p.replace(publicDir, '')) || '/';
+          const name = path.basename(p);
+          const entry =
+            name === 'index.html'
+              ? basePath + (basePath !== '/' ? '/' : '')
+              : path.join(basePath, name.replace(/\.html$/, ''));
+          if (
+            entry.startsWith('/assets/') ||
+            entry.startsWith('/' + WORKER_JS_NAME + '/') ||
+            entry === '/' + WORKER_JS_NAME ||
+            entry === '/' + ROUTES_JSON_NAME ||
+            entry === '/' + HEADERS_NAME
+          ) {
+            continue;
           }
+          if (!staticPaths.includes(entry)) {
+            staticPaths.push(entry);
+          }
+        }
+        const MAX_CLOUDFLARE_RULES = 100;
+        if (staticPaths.length + 1 > MAX_CLOUDFLARE_RULES) {
+          throw new Error(
+            `The number of static paths exceeds the limit of ${MAX_CLOUDFLARE_RULES}. ` +
+              `You need to create a custom ${ROUTES_JSON_NAME} file in the public folder. ` +
+              `See https://developers.cloudflare.com/pages/functions/routing/#functions-invocation-routes`,
+          );
         }
         const staticRoutes: StaticRoutes = {
           version: 1,
@@ -160,6 +211,11 @@ export default {
         force: true,
       });
 
+      appendFileSync(
+        path.join(outDir, WORKER_JS_NAME, DIST_ENTRIES_JS),
+        `export const buildData = ${JSON.stringify(platformObject.buildData)};`,
+      );
+
       const wranglerTomlFile = path.join(rootDir, 'wrangler.toml');
       if (!existsSync(wranglerTomlFile)) {
         writeFileSync(
@@ -167,7 +223,7 @@ export default {
           `
 # See https://developers.cloudflare.com/pages/functions/wrangler-configuration/
 name = "waku-project"
-compatibility_date = "2024-04-03"
+compatibility_date = "2024-09-02"
 compatibility_flags = [ "nodejs_als" ]
 pages_build_output_dir = "./dist"
 `,

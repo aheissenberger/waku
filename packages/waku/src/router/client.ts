@@ -31,6 +31,11 @@ import {
   LOCATION_ID,
 } from './common.js';
 import type { RouteProps, ShouldSkip } from './common.js';
+import type { RouteConfig } from './base-types.js';
+
+type InferredPaths = RouteConfig extends { paths: infer UserPaths }
+  ? UserPaths
+  : string;
 
 declare global {
   interface ImportMeta {
@@ -82,7 +87,7 @@ export function useRouter_UNSTABLE() {
   }
   const { route, changeRoute, prefetchRoute } = router;
   const push = useCallback(
-    (to: string) => {
+    (to: InferredPaths) => {
       const url = new URL(to, window.location.href);
       window.history.pushState(
         {
@@ -97,7 +102,7 @@ export function useRouter_UNSTABLE() {
     [changeRoute],
   );
   const replace = useCallback(
-    (to: string) => {
+    (to: InferredPaths) => {
       const url = new URL(to, window.location.href);
       window.history.replaceState(window.history.state, '', url);
       changeRoute(parseRoute(url));
@@ -135,7 +140,7 @@ export function useRouter_UNSTABLE() {
 }
 
 export type LinkProps = {
-  to: string;
+  to: InferredPaths;
   pending?: ReactNode;
   notPending?: ReactNode;
   children: ReactNode;
@@ -546,6 +551,14 @@ export function ServerRouter({
   );
 }
 
+function renderError(message: string) {
+  return createElement(
+    'html',
+    null,
+    createElement('body', null, createElement('h1', null, message)),
+  );
+}
+
 class ErrorBoundary extends Component<
   { children: ReactNode },
   { error?: unknown }
@@ -563,9 +576,9 @@ class ErrorBoundary extends Component<
         this.state.error instanceof Error &&
         (this.state.error as any).statusCode === 404
       ) {
-        return createElement('h1', null, 'Not Found');
+        return renderError('Not Found');
       }
-      return createElement('h1', null, String(this.state.error));
+      return renderError(String(this.state.error));
     }
     return this.props.children;
   }

@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { createRequire } from 'node:module';
 import { Hono } from 'hono';
+import { contextStorage } from 'hono/context-storage';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import * as dotenv from 'dotenv';
@@ -94,7 +95,9 @@ if (values.version) {
 
 async function runDev() {
   const config = await loadConfig();
+  const honoEnhancer = config.unstable_honoEnhancer || ((app) => app);
   const app = new Hono();
+  app.use(contextStorage());
   app.use('*', runner({ cmd: 'dev', config, env: process.env as any }));
   app.notFound((c) => {
     // FIXME can we avoid hardcoding the public path?
@@ -105,7 +108,7 @@ async function runDev() {
     return c.text('404 Not Found', 404);
   });
   const port = parseInt(values.port || '3000', 10);
-  await startServer(app, port);
+  await startServer(honoEnhancer(app), port);
 }
 
 async function runBuild() {
@@ -134,10 +137,13 @@ async function runBuild() {
 }
 
 async function runStart() {
-  const { distDir = 'dist' } = await loadConfig();
+  const config = await loadConfig();
+  const { distDir = 'dist' } = config;
+  const honoEnhancer = config.unstable_honoEnhancer || ((app) => app);
   const loadEntries = () =>
     import(pathToFileURL(path.resolve(distDir, DIST_ENTRIES_JS)).toString());
   const app = new Hono();
+  app.use(contextStorage());
   app.use('*', serveStatic({ root: path.join(distDir, DIST_PUBLIC) }));
   app.use('*', runner({ cmd: 'start', loadEntries, env: process.env as any }));
   app.notFound((c) => {
@@ -149,7 +155,7 @@ async function runStart() {
     return c.text('404 Not Found', 404);
   });
   const port = parseInt(values.port || '8080', 10);
-  await startServer(app, port);
+  await startServer(honoEnhancer(app), port);
 }
 
 function startServer(app: Hono, port: number) {

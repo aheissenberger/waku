@@ -1,7 +1,7 @@
 {
   "name": "waku",
   "description": "⛩️ The minimal React framework",
-  "version": "0.21.1",
+  "version": "0.21.2",
   "type": "module",
   "author": "Daishi Kato",
   "homepage": "https://waku.gg",
@@ -30,9 +30,13 @@
       "types": "./dist/middleware/*.d.ts",
       "default": "./dist/middleware/*.js"
     },
-    "./internals": {
-      "types": "./dist/internals.d.ts",
-      "default": "./dist/internals.js"
+    "./unstable_internals": {
+      "types": "./dist/unstable_internals.d.ts",
+      "default": "./dist/unstable_internals.js"
+    },
+    "./unstable_hono": {
+      "types": "./dist/unstable_hono.d.ts",
+      "default": "./dist/unstable_hono.js"
     },
     "./client": {
       "types": "./dist/client.d.ts",
@@ -41,6 +45,10 @@
     "./server": {
       "types": "./dist/server.d.ts",
       "default": "./dist/server.js"
+    },
+    "./router": {
+      "types": "./dist/router/base-types.d.ts",
+      "default": "./dist/router/base-types.js"
     },
     "./router/client": {
       "types": "./dist/router/client.d.ts",
@@ -74,20 +82,20 @@
     "@swc/core": "1.6.7",
     "@vitejs/plugin-react": "4.3.1",
     "dotenv": "16.4.5",
-    "hono": "4.5.9",
+    "hono": "4.6.1",
     "rsc-html-stream": "0.0.3",
-    "vite": "5.4.2"
+    "vite": "5.4.4"
   },
   "devDependencies": {
     "@netlify/functions": "^2.8.1",
     "@swc/cli": "^0.4.0",
-    "rollup": "^4.21.1",
+    "rollup": "^4.21.3",
     "ts-expect": "^1.3.0",
     "vitest": "^2.0.5"
   },
   "peerDependencies": {
-    "react": "19.0.0-rc-7771d3a7-20240827",
-    "react-dom": "19.0.0-rc-7771d3a7-20240827",
-    "react-server-dom-webpack": "19.0.0-rc-7771d3a7-20240827"
+    "react": "19.0.0-rc-d6cb4e77-20240911",
+    "react-dom": "19.0.0-rc-d6cb4e77-20240911",
+    "react-server-dom-webpack": "19.0.0-rc-d6cb4e77-20240911"
   }
 }

@@ -42,7 +42,6 @@
     "react-client-only": "^1.0.2",
     "react-dom": "19.0.0-rc-d6cb4e77-20240911",
     "react-server-dom-webpack": "19.0.0-rc-d6cb4e77-20240911",
-    "recharts": "^2.12.7",
     "waku": "workspace:*"
   },
   "devDependencies": {

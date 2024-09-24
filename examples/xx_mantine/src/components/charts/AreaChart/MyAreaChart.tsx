@@ -5,7 +5,7 @@ import { data } from './data';
 
 export default function MyAreaChart() {
   return (
-    
+    <ClientOnly>
       <AreaChart
         h={300}
         data={data}
@@ -17,6 +17,6 @@ export default function MyAreaChart() {
         ]}
         curveType="linear"
       />
-
+    </ClientOnly>
   );
 }
